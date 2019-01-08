@@ -23,9 +23,9 @@ func initEnvs() {
 	if err != nil {
 		fmt.Println("cant load .env")
 	}
-	envs["CERT2019_PORT"] = os.Getenv("CERT2019_PORT")
-	if envs["CERT2019_PORT"] == "" {
-		envs["CERT2019_PORT"] = "3000"
+	envs["PORT"] = os.Getenv("PORT")
+	if envs["PORT"] == "" {
+		envs["PORT"] = "3000"
 	}
 	envs["CERT2019_MONGO_URL"] = os.Getenv("CERT2019_MONGO_URL")
 	if envs["CERT2019_MONGO_URL"] == "" {

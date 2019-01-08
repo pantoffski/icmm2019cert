@@ -47,5 +47,5 @@ func main() {
 	if err := chi.Walk(r, walkFunc); err != nil {
 		log.Panicf("Logging err: %s\n", err.Error())
 	}
-	log.Fatal(http.ListenAndServe(":"+cfg.Getenv("CERT2019_PORT"), r))
+	log.Fatal(http.ListenAndServe(":"+cfg.Getenv("PORT"), r))
 }
