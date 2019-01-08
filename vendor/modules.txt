@@ -1,0 +1,7 @@
+# github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
+github.com/golang/freetype
+github.com/golang/freetype/truetype
+github.com/golang/freetype/raster
+# golang.org/x/image v0.0.0-20181116024801-cd38e8056d9b
+golang.org/x/image/font
+golang.org/x/image/math/fixed
