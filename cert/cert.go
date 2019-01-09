@@ -42,9 +42,9 @@ var (
 // Runner is a runner's result
 type Runner struct {
 	ID       bson.ObjectId `bson:"_id"`
-	BibNO    int           `bson:"bib_number"`
-	FName    string        `bson:"first_name"`
-	LName    string        `bson:"last_name"`
+	BibNO    int           `bson:"bibNumber"`
+	FName    string        `bson:"firstname"`
+	LName    string        `bson:"lastname"`
 	ChipTime float64       `bson:"chiptime"`
 	GunTime  float64       `bson:"guntime"`
 }
@@ -82,36 +82,36 @@ func Image(bibNO int, w http.ResponseWriter) {
 	pt := freetype.Pt(xInt-xOffset, yInt+int(ctx.PointToFixed(utf8FontSize)>>6))
 	ctx.DrawString(runnerName, pt)
 
-	//draw chiptime
-	// xInt, _ = strconv.Atoi(x)
-	// yInt, _ = strconv.Atoi(y)
-	xInt = 340
-	yInt = 350
-	fontSize = 50
-	ctx.SetFontSize(fontSize)
-	pt = freetype.Pt(xInt, yInt+int(ctx.PointToFixed(utf8FontSize)>>6))
-	ctx.DrawString(formatTime(runner.ChipTime), pt)
+	/*
+		//draw chiptime
+		// xInt, _ = strconv.Atoi(x)
+		// yInt, _ = strconv.Atoi(y)
+		xInt = 340
+		yInt = 350
+		fontSize = 50
+		ctx.SetFontSize(fontSize)
+		pt = freetype.Pt(xInt, yInt+int(ctx.PointToFixed(utf8FontSize)>>6))
+		ctx.DrawString(formatTime(runner.ChipTime), pt)
 
-	//draw guntime
-	xInt = 420
-	yInt = 435
-	fontSize = 50
-	ctx.SetFontSize(fontSize)
-	pt = freetype.Pt(xInt, yInt+int(ctx.PointToFixed(utf8FontSize)>>6))
-	ctx.DrawString(formatTime(runner.GunTime), pt)
+		//draw guntime
+		xInt = 420
+		yInt = 435
+		fontSize = 50
+		ctx.SetFontSize(fontSize)
+		pt = freetype.Pt(xInt, yInt+int(ctx.PointToFixed(utf8FontSize)>>6))
+		ctx.DrawString(formatTime(runner.GunTime), pt)
+
+	*/
 
 	err = png.Encode(w, background)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	fmt.Println("done save")
-
 }
 
 //init load and instantiate reusable things
 func init() {
-	fmt.Println("init cert")
 	imgFile, err := os.Open("./cert.jpg")
 	if err != nil {
 		fmt.Println(err)
