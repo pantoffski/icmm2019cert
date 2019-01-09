@@ -57,7 +57,7 @@ func Image(bibNO int, w http.ResponseWriter) {
 	db := database.GetDB()
 	defer db.Session.Close()
 	runner := Runner{}
-	err := db.C("results").Find(bson.M{"bib_number": bibNO}).One(&runner)
+	err := db.C("results").Find(bson.M{"bibNumber": bibNO}).One(&runner)
 	if err != nil {
 		http.Error(w, "runner not found", 404)
 		return
