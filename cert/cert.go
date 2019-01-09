@@ -41,12 +41,14 @@ var (
 
 // Runner is a runner's result
 type Runner struct {
-	ID       bson.ObjectId `bson:"_id"`
-	BibNO    int           `bson:"bibNumber"`
-	FName    string        `bson:"firstname"`
-	LName    string        `bson:"lastname"`
-	ChipTime float64       `bson:"chiptime"`
-	GunTime  float64       `bson:"guntime"`
+	ID        bson.ObjectId `bson:"_id"`
+	BibNO     int           `bson:"bibNumber"`
+	FName     string        `bson:"firstname"`
+	LName     string        `bson:"lastname"`
+	ChipTime  float64       `bson:"chiptime"`
+	GunTime   float64       `bson:"guntime"`
+	Challenge string        `bson:"challenge"`
+	NameOnBib string        `bson:"nameOnBib"`
 }
 
 // func CertImgDebug(bibNO, txt, x, y string, w http.ResponseWriter) {
@@ -57,7 +59,7 @@ func Image(bibNO int, w http.ResponseWriter) {
 	db := database.GetDB()
 	defer db.Session.Close()
 	runner := Runner{}
-	err := db.C("results").Find(bson.M{"bibNumber": bibNO}).One(&runner)
+	err := db.C("bib_subscribers").Find(bson.M{"bibNumber": bibNO}).One(&runner)
 	if err != nil {
 		http.Error(w, "runner not found", 404)
 		return
@@ -81,6 +83,24 @@ func Image(bibNO int, w http.ResponseWriter) {
 	ctx.SetFontSize(fontSize)
 	pt := freetype.Pt(xInt-xOffset, yInt+int(ctx.PointToFixed(utf8FontSize)>>6))
 	ctx.DrawString(runnerName, pt)
+
+	//draw Challenge
+	// xInt, _ = strconv.Atoi(x)
+	// yInt, _ = strconv.Atoi(y)
+	xInt = 340
+	yInt = 350
+	fontSize = 50
+	ctx.SetFontSize(fontSize)
+	pt = freetype.Pt(xInt, yInt+int(ctx.PointToFixed(utf8FontSize)>>6))
+	ctx.DrawString(runner.Challenge, pt)
+
+	//draw NameOnBib
+	xInt = 420
+	yInt = 435
+	fontSize = 50
+	ctx.SetFontSize(fontSize)
+	pt = freetype.Pt(xInt, yInt+int(ctx.PointToFixed(utf8FontSize)>>6))
+	ctx.DrawString(runner.NameOnBib, pt)
 
 	/*
 		//draw chiptime
