@@ -46,6 +46,7 @@ func getName(w http.ResponseWriter, r *http.Request) {
 	bibNO, _ := strconv.Atoi(chi.URLParam(r, "bibNO"))
 	db := database.GetDB()
 	defer db.Session.Close()
+	defer r.Body.Close()
 	runner := cert.Runner{}
 	err := db.C("bib_subscribers").Find(bson.M{"bibNumber": bibNO}).One(&runner)
 	if err != nil {
