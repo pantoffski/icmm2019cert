@@ -1,17 +1,20 @@
 package main
 
 import (
-	"strconv"
-	"log"
-	"icmm2019cert/cfg"
 	"icmm2019cert/cert"
+	"icmm2019cert/cfg"
+	"icmm2019cert/database"
+	"log"
 	"net/http"
+	"strconv"
+
+	"github.com/globalsign/mgo/bson"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/render"
 )
- 
+
 // InitRoutes the main route config
 func InitRoutes() *chi.Mux {
 	router := chi.NewRouter()
@@ -30,13 +33,26 @@ func InitRoutes() *chi.Mux {
 		middleware.DefaultCompress,
 		middleware.RedirectSlashes,
 		middleware.Recoverer,
-	) 
-	router.Get("/{bibNO}",genCert)
+	)
+	router.Get("/{bibNO}", genCert)
+	router.Get("/name/{bibNO}", getName)
 	return router
 }
 func genCert(w http.ResponseWriter, r *http.Request) {
-	bibNO,_:=strconv.Atoi(chi.URLParam(r,"bibNO"))
-	cert.Image(bibNO,w)
+	bibNO, _ := strconv.Atoi(chi.URLParam(r, "bibNO"))
+	cert.Image(bibNO, w)
+}
+func getName(w http.ResponseWriter, r *http.Request) {
+	bibNO, _ := strconv.Atoi(chi.URLParam(r, "bibNO"))
+	db := database.GetDB()
+	defer db.Session.Close()
+	runner := cert.Runner{}
+	err := db.C("bib_subscribers").Find(bson.M{"bibNumber": bibNO}).One(&runner)
+	if err != nil {
+		http.Error(w, "runner not found", 404)
+		return
+	}
+	render.PlainText(w, r, runner.FName+" "+runner.LName)
 }
 func main() {
 	r := InitRoutes()
