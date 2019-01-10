@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"math/rand"
 	"github.com/globalsign/mgo/bson"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -41,6 +42,11 @@ func InitRoutes() *chi.Mux {
 }
 func genCert(w http.ResponseWriter, r *http.Request) {
 	bibNO, _ := strconv.Atoi(chi.URLParam(r, "bibNO"))
+	// txt:=r.URL.Query().Get("txt")
+	// x:=r.URL.Query().Get("x")
+	// y:=r.URL.Query().Get("y")
+	// size:=r.URL.Query().Get("size")
+	// cert.Image(bibNO,txt,x,y,size, w)
 	cert.Image(bibNO, w)
 }
 func getName(w http.ResponseWriter, r *http.Request) {
@@ -59,6 +65,8 @@ func getName(w http.ResponseWriter, r *http.Request) {
 func main() {
 
 	http.DefaultClient.Timeout = time.Minute * 1
+	
+    rand.Seed(time.Now().Unix())
 	r := InitRoutes()
 	walkFunc := func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		log.Printf("%s -> %s\n", method, route)

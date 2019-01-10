@@ -9,6 +9,7 @@ import (
 	_ "image/jpeg"
 	"image/png"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"os"
 	_ "strings"
@@ -19,30 +20,27 @@ import (
 )
 
 var (
-	backgroundWidth  = 960
-	backgroundHeight = 720
+	backgroundWidth  = 1000
+	backgroundHeight = 1000
 	utf8FontFile     = "./font.ttf"
 	utf8FontSize     = float64(45.0)
 	spacing          = float64(1.5)
 	dpi              = float64(72)
 	ctx              = new(freetype.Context)
-	ctx4Test         = new(freetype.Context)
 	utf8Font         = new(truetype.Font)
-	red              = color.RGBA{255, 0, 0, 255}
-	blue             = color.RGBA{0, 0, 255, 255}
-	white            = color.RGBA{255, 255, 255, 255}
-	black            = color.RGBA{0, 0, 0, 255}
 	certBG           interface{}
+	colorPink        *image.Uniform
 	colorBlue        *image.Uniform
-	colorBlack       *image.Uniform
+	colorRed         *image.Uniform
 	colorWhite       *image.Uniform
-	img4TxtWidthTest *image.RGBA
 )
 
 // Runner is a runner's result
 type Runner struct {
 	ID        bson.ObjectId `bson:"_id"`
 	BibNO     int           `bson:"bibNumber"`
+	FullBib   string        `bson:"fullBib"`
+	Gender    string        `bson:"gender"`
 	FName     string        `bson:"firstname"`
 	LName     string        `bson:"lastname"`
 	ChipTime  float64       `bson:"chiptime"`
@@ -65,6 +63,8 @@ func Image(bibNO int, w http.ResponseWriter) {
 		return
 	}
 
+	runner.GunTime = 2000000.0 + rand.Float64()*4000000
+	runner.ChipTime = 2000000.0 + rand.Float64()*4000000
 	var xInt, yInt int
 	var fontSize float64
 	background := image.NewRGBA(image.Rect(0, 0, backgroundWidth, backgroundHeight))
@@ -73,55 +73,72 @@ func Image(bibNO int, w http.ResponseWriter) {
 	draw.Draw(background, background.Bounds(), bg, image.Point{0, 0}, draw.Src)
 
 	ctx.SetDst(background)
+	ctx.SetClip(background.Bounds())
 
 	runnerName := runner.FName + " " + runner.LName
 	// draw Name
-	xInt = 480
-	yInt = 150
-	fontSize = getFontSize(runnerName, 100, 400)
+	xInt = 498
+	yInt = 190
+	fontSize = 80.0
 	xOffset := int(getWidth(runnerName, fontSize) / 2)
 	ctx.SetFontSize(fontSize)
-	pt := freetype.Pt(xInt-xOffset, yInt+int(ctx.PointToFixed(utf8FontSize)>>6))
+	ctx.SetSrc(colorPink)
+	pt := freetype.Pt(xInt-xOffset, yInt+int(ctx.PointToFixed(fontSize)>>6))
 	ctx.DrawString(runnerName, pt)
 
-	//draw Challenge
+	// draw bib
+	xInt = 310
+	yInt = 295
+	fontSize = 35.0
+	ctx.SetFontSize(fontSize)
+	ctx.SetSrc(colorWhite)
+	pt = freetype.Pt(xInt, yInt+int(ctx.PointToFixed(fontSize)>>6))
+	ctx.DrawString(runner.FullBib, pt)
+
+	// draw gender
+	xInt = 790
+	yInt = 295
+	fontSize = 35.0
+	ctx.SetFontSize(fontSize)
+	gender := "FEMALE"
+	if runner.Gender == "M" {
+		gender = "MALE"
+	}
+	xOffset = int(getWidth(gender, fontSize) / 2)
+	ctx.SetSrc(colorWhite)
+	pt = freetype.Pt(xInt-xOffset, yInt+int(ctx.PointToFixed(fontSize)>>6))
+	ctx.DrawString(gender, pt)
+
+	// draw guntime
+	xInt = 500
+	yInt = 430
+	fontSize = 90.0
+	xOffset = int(getWidth(formatTime(runner.GunTime), fontSize) / 2)
+	ctx.SetFontSize(fontSize)
+	ctx.SetSrc(colorRed)
+	pt = freetype.Pt(xInt-xOffset, yInt+int(ctx.PointToFixed(fontSize)>>6))
+	ctx.DrawString(formatTime(runner.GunTime), pt)
+
+	// draw chiptime
+	xInt = 630
+	yInt = 560
+	fontSize = 35.0
+	xOffset = int(getWidth(formatTime(runner.ChipTime), fontSize) / 2)
+	ctx.SetFontSize(fontSize)
+	ctx.SetSrc(colorWhite)
+	pt = freetype.Pt(xInt-xOffset, yInt+int(ctx.PointToFixed(fontSize)>>6))
+	ctx.DrawString(formatTime(runner.ChipTime), pt)
+
+	// //draw txt
 	// xInt, _ = strconv.Atoi(x)
 	// yInt, _ = strconv.Atoi(y)
-	xInt = 340
-	yInt = 350
-	fontSize = 50
-	ctx.SetFontSize(fontSize)
-	pt = freetype.Pt(xInt, yInt+int(ctx.PointToFixed(utf8FontSize)>>6))
-	ctx.DrawString(runner.Challenge, pt)
+	// sizeInt, _ := strconv.Atoi(s)
 
-	//draw NameOnBib
-	xInt = 420
-	yInt = 435
-	fontSize = 50
-	ctx.SetFontSize(fontSize)
-	pt = freetype.Pt(xInt, yInt+int(ctx.PointToFixed(utf8FontSize)>>6))
-	ctx.DrawString(runner.NameOnBib, pt)
-
-	/*
-		//draw chiptime
-		// xInt, _ = strconv.Atoi(x)
-		// yInt, _ = strconv.Atoi(y)
-		xInt = 340
-		yInt = 350
-		fontSize = 50
-		ctx.SetFontSize(fontSize)
-		pt = freetype.Pt(xInt, yInt+int(ctx.PointToFixed(utf8FontSize)>>6))
-		ctx.DrawString(formatTime(runner.ChipTime), pt)
-
-		//draw guntime
-		xInt = 420
-		yInt = 435
-		fontSize = 50
-		ctx.SetFontSize(fontSize)
-		pt = freetype.Pt(xInt, yInt+int(ctx.PointToFixed(utf8FontSize)>>6))
-		ctx.DrawString(formatTime(runner.GunTime), pt)
-
-	*/
+	// xOffset = int(getWidth(txt, float64(sizeInt)) / 2)
+	// ctx.SetSrc(colorPink)
+	// ctx.SetFontSize(float64(sizeInt))
+	// pt = freetype.Pt(xInt-xOffset, yInt+int(ctx.PointToFixed(float64(sizeInt))>>6))
+	// ctx.DrawString(txt, pt)
 
 	err = png.Encode(w, background)
 	if err != nil {
@@ -132,7 +149,7 @@ func Image(bibNO int, w http.ResponseWriter) {
 
 //init load and instantiate reusable things
 func init() {
-	imgFile, err := os.Open("./cert.jpg")
+	imgFile, err := os.Open("./cert.png")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -155,38 +172,20 @@ func init() {
 	}
 	colorBlue = image.NewUniform(color.RGBA{0, 0, 255, 255})
 	colorWhite = image.NewUniform(color.RGBA{255, 255, 255, 255})
-	colorBlack = image.NewUniform(color.RGBA{0, 0, 0, 255})
+	colorRed = image.NewUniform(color.RGBA{129, 23, 25, 255})
+	colorPink = image.NewUniform(color.RGBA{232, 133, 162, 255})
 
-	img4TxtWidthTest = image.NewRGBA(image.Rect(0, 0, backgroundWidth, backgroundHeight))
 	ctx = freetype.NewContext()
 	ctx.SetDPI(dpi)
 	ctx.SetFont(utf8Font)
-	ctx.SetClip(img4TxtWidthTest.Bounds())
 	ctx.SetSrc(colorBlue)
-	ctx4Test = freetype.NewContext()
-	ctx4Test.SetDPI(dpi)
-	ctx4Test.SetFont(utf8Font)
-	ctx4Test.SetClip(img4TxtWidthTest.Bounds())
-	ctx4Test.SetSrc(colorBlue)
-	ctx4Test.SetDst(img4TxtWidthTest)
-}
-
-// getFontSize return largest possible FontSize that will make text length less than maxWidth , bad big-O but i don't give a shit
-func getFontSize(txt string, fontSize float64, maxWidth int) float64 {
-	goodSize := fontSize + 1.0
-	currWidth := 1000000
-	for currWidth > maxWidth {
-		goodSize = goodSize - 1.0
-		currWidth = getWidth(txt, goodSize)
-	}
-	return goodSize
 }
 
 // getWidth get width of txt that draw with specify fontSize
 func getWidth(txt string, fontSize float64) int {
-	pt := freetype.Pt(0, 0)
-	ctx4Test.SetFontSize(fontSize)
-	l, _ := ctx4Test.DrawString(txt, pt)
+	pt := freetype.Pt(0, 2000)
+	ctx.SetFontSize(fontSize)
+	l, _ := ctx.DrawString(txt, pt)
 	return l.X.Floor()
 }
 
@@ -198,9 +197,10 @@ func formatTime(t float64) string {
 	ss = ss - mm*60
 	hh := int(mm / 60)
 	mm = mm - hh*60
-	if hh > 0 {
-		ret = fmt.Sprintf("%d", hh) + ":"
+	if hh < 10 {
+		ret = ret + "0"
 	}
+	ret = ret + fmt.Sprintf("%d", hh) + ":"
 	if hh > 0 || mm > 0 {
 		if mm < 10 {
 			ret = ret + "0"
