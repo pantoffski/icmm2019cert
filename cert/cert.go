@@ -26,7 +26,6 @@ var (
 	utf8FontSize     = float64(45.0)
 	spacing          = float64(1.5)
 	dpi              = float64(72)
-	ctx              = new(freetype.Context)
 	utf8Font         = new(truetype.Font)
 	certBG           interface{}
 	colorPink        *image.Uniform
@@ -72,6 +71,10 @@ func Image(bibNO int, w http.ResponseWriter) {
 	bg, _ := certBG.(image.Image)
 	draw.Draw(background, background.Bounds(), bg, image.Point{0, 0}, draw.Src)
 
+	ctx := freetype.NewContext()
+	ctx.SetDPI(dpi)
+	ctx.SetFont(utf8Font)
+	ctx.SetSrc(colorBlue)
 	ctx.SetDst(background)
 	ctx.SetClip(background.Bounds())
 
@@ -80,10 +83,10 @@ func Image(bibNO int, w http.ResponseWriter) {
 	xInt = 498
 	yInt = 190
 	fontSize = 80.0
-	xOffset := int(getWidth(runnerName, fontSize) / 2)
+	xOffset := int(getWidth(runnerName, fontSize, ctx) / 2)
 	for xOffset > 480 {
 		fontSize = fontSize - 5
-		xOffset = int(getWidth(runnerName, fontSize) / 2)
+		xOffset = int(getWidth(runnerName, fontSize, ctx) / 2)
 	}
 	fmt.Println(xOffset)
 	ctx.SetFontSize(fontSize)
@@ -95,7 +98,7 @@ func Image(bibNO int, w http.ResponseWriter) {
 	xInt = 385
 	yInt = 295
 	fontSize = 35.0
-	xOffset = int(getWidth(runner.FullBib, fontSize) / 2)
+	xOffset = int(getWidth(runner.FullBib, fontSize, ctx) / 2)
 	ctx.SetFontSize(fontSize)
 	ctx.SetSrc(colorWhite)
 	pt = freetype.Pt(xInt-xOffset, yInt+int(ctx.PointToFixed(fontSize)>>6))
@@ -110,7 +113,7 @@ func Image(bibNO int, w http.ResponseWriter) {
 	if runner.Gender == "M" {
 		gender = "MALE"
 	}
-	xOffset = int(getWidth(gender, fontSize) / 2)
+	xOffset = int(getWidth(gender, fontSize, ctx) / 2)
 	ctx.SetSrc(colorWhite)
 	pt = freetype.Pt(xInt-xOffset, yInt+int(ctx.PointToFixed(fontSize)>>6))
 	ctx.DrawString(gender, pt)
@@ -119,7 +122,7 @@ func Image(bibNO int, w http.ResponseWriter) {
 	xInt = 500
 	yInt = 430
 	fontSize = 90.0
-	xOffset = int(getWidth(formatTime(runner.GunTime), fontSize) / 2)
+	xOffset = int(getWidth(formatTime(runner.GunTime), fontSize, ctx) / 2)
 	ctx.SetFontSize(fontSize)
 	ctx.SetSrc(colorRed)
 	pt = freetype.Pt(xInt-xOffset, yInt+int(ctx.PointToFixed(fontSize)>>6))
@@ -129,7 +132,7 @@ func Image(bibNO int, w http.ResponseWriter) {
 	xInt = 635
 	yInt = 560
 	fontSize = 35.0
-	xOffset = int(getWidth(formatTime(runner.ChipTime), fontSize) / 2)
+	xOffset = int(getWidth(formatTime(runner.ChipTime), fontSize, ctx) / 2)
 	ctx.SetFontSize(fontSize)
 	ctx.SetSrc(colorWhite)
 	pt = freetype.Pt(xInt-xOffset, yInt+int(ctx.PointToFixed(fontSize)>>6))
@@ -181,14 +184,10 @@ func init() {
 	colorRed = image.NewUniform(color.RGBA{129, 23, 25, 255})
 	colorPink = image.NewUniform(color.RGBA{232, 133, 162, 255})
 
-	ctx = freetype.NewContext()
-	ctx.SetDPI(dpi)
-	ctx.SetFont(utf8Font)
-	ctx.SetSrc(colorBlue)
 }
 
 // getWidth get width of txt that draw with specify fontSize
-func getWidth(txt string, fontSize float64) int {
+func getWidth(txt string, fontSize float64, ctx *freetype.Context) int {
 	pt := freetype.Pt(0, 2000)
 	ctx.SetFontSize(fontSize)
 	l, _ := ctx.DrawString(txt, pt)
