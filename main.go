@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/globalsign/mgo/bson"
 	"github.com/go-chi/chi"
@@ -56,6 +57,8 @@ func getName(w http.ResponseWriter, r *http.Request) {
 	render.PlainText(w, r, runner.FName+" "+runner.LName)
 }
 func main() {
+
+	http.DefaultClient.Timeout = time.Minute * 2
 	r := InitRoutes()
 	walkFunc := func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		log.Printf("%s -> %s\n", method, route)
