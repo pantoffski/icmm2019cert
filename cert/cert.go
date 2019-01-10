@@ -80,6 +80,9 @@ func Image(bibNO int, w http.ResponseWriter) {
 	xInt = 498
 	yInt = 190
 	fontSize = 80.0
+	if len(runnerName) > 22 {
+		fontSize = 70.0
+	}
 	xOffset := int(getWidth(runnerName, fontSize) / 2)
 	ctx.SetFontSize(fontSize)
 	ctx.SetSrc(colorPink)
