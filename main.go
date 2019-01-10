@@ -58,7 +58,7 @@ func getName(w http.ResponseWriter, r *http.Request) {
 }
 func main() {
 
-	http.DefaultClient.Timeout = time.Minute * 2
+	http.DefaultClient.Timeout = time.Minute * 1
 	r := InitRoutes()
 	walkFunc := func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		log.Printf("%s -> %s\n", method, route)
