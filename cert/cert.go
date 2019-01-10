@@ -80,25 +80,12 @@ func Image(bibNO int, w http.ResponseWriter) {
 	xInt = 498
 	yInt = 190
 	fontSize = 80.0
-	if len(runnerName) > 18 {
-		fontSize = 70.0
-	}
-	if len(runnerName) > 21 {
-		fontSize = 60.0
-	}
-	if len(runnerName) > 24 {
-		fontSize = 50.0
-	}
-	if len(runnerName) > 28 {
-		fontSize = 40.0
-	}
-	if len(runnerName) > 34 {
-		fontSize = 35.0
-	}
-	if len(runnerName) > 40 {
-		fontSize = 30.0
-	}
 	xOffset := int(getWidth(runnerName, fontSize) / 2)
+	for xOffset > 480 {
+		fontSize = fontSize - 5
+		xOffset = int(getWidth(runnerName, fontSize) / 2)
+	}
+	fmt.Println(xOffset)
 	ctx.SetFontSize(fontSize)
 	ctx.SetSrc(colorPink)
 	pt := freetype.Pt(xInt-xOffset, yInt+int(ctx.PointToFixed(fontSize)>>6))
