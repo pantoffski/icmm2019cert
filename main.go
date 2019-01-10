@@ -64,7 +64,7 @@ func getName(w http.ResponseWriter, r *http.Request) {
 }
 func main() {
 
-	http.DefaultClient.Timeout = time.Minute * 1
+	http.DefaultClient.Timeout = time.Minute * 3
 	
     rand.Seed(time.Now().Unix())
 	r := InitRoutes()
