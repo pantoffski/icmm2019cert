@@ -49,7 +49,7 @@ type Runner struct {
 	NameOnBib string        `bson:"nameOnBib"`
 }
 
-// func CertImgDebug(bibNO, txt, x, y string, w http.ResponseWriter) {
+// func CertImgDebug(bibNO, txt, x, y, s string, w http.ResponseWriter) {
 
 //Image gen cert img from bib
 func Image(bibNO int, w http.ResponseWriter) {
@@ -87,12 +87,13 @@ func Image(bibNO int, w http.ResponseWriter) {
 	ctx.DrawString(runnerName, pt)
 
 	// draw bib
-	xInt = 310
+	xInt = 385
 	yInt = 295
 	fontSize = 35.0
+	xOffset = int(getWidth(runner.FullBib, fontSize) / 2)
 	ctx.SetFontSize(fontSize)
 	ctx.SetSrc(colorWhite)
-	pt = freetype.Pt(xInt, yInt+int(ctx.PointToFixed(fontSize)>>6))
+	pt = freetype.Pt(xInt-xOffset, yInt+int(ctx.PointToFixed(fontSize)>>6))
 	ctx.DrawString(runner.FullBib, pt)
 
 	// draw gender
@@ -120,7 +121,7 @@ func Image(bibNO int, w http.ResponseWriter) {
 	ctx.DrawString(formatTime(runner.GunTime), pt)
 
 	// draw chiptime
-	xInt = 630
+	xInt = 635
 	yInt = 560
 	fontSize = 35.0
 	xOffset = int(getWidth(formatTime(runner.ChipTime), fontSize) / 2)

@@ -47,7 +47,7 @@ func genCert(w http.ResponseWriter, r *http.Request) {
 	// y:=r.URL.Query().Get("y")
 	// size:=r.URL.Query().Get("size")
 	// cert.Image(bibNO,txt,x,y,size, w)
-	cert.Image(bibNO, w)
+	 cert.Image(bibNO, w)
 }
 func getName(w http.ResponseWriter, r *http.Request) {
 	bibNO, _ := strconv.Atoi(chi.URLParam(r, "bibNO"))
