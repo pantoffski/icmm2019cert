@@ -6,7 +6,10 @@ import (
 	"icmm2019cert/database"
 	"log"
 	"net/http"
+	"path/filepath"
 	"strconv"
+	"os"
+	"html/template"
 	"time"
 
 	"math/rand"
@@ -17,6 +20,7 @@ import (
 	"github.com/go-chi/render"
 )
 
+var liffHTML *template.Template
 // InitRoutes the main route config
 func InitRoutes() *chi.Mux {
 	router := chi.NewRouter()
@@ -38,10 +42,14 @@ func InitRoutes() *chi.Mux {
 	)
 	router.Get("/{bibNO}", genCert)
 	router.Get("/name/{bibNO}", getName)
+	router.Get("/liff", serveLiffHTML)
 	return router
 }
 func genCert(w http.ResponseWriter, r *http.Request) {
-	bibNO, _ := strconv.Atoi(chi.URLParam(r, "bibNO"))
+	bibNO, err := strconv.Atoi(chi.URLParam(r, "bibNO"))
+	if(err!=nil){
+		http.Error(w, "runner not found", 404)
+	}
 	// txt:=r.URL.Query().Get("txt")
 	// x:=r.URL.Query().Get("x")
 	// y:=r.URL.Query().Get("y")
@@ -62,8 +70,13 @@ func getName(w http.ResponseWriter, r *http.Request) {
 	}
 	render.PlainText(w, r, runner.FName+" "+runner.LName)
 }
+func serveLiffHTML(w http.ResponseWriter, r *http.Request) {
+	liffHTML.Execute(w, nil)
+}
 func main() {
 
+	workDir, _ := os.Getwd()
+	liffHTML, _ = template.ParseFiles(filepath.Join(workDir, "/liff.html"))
 	http.DefaultClient.Timeout = time.Minute * 3
 	
     rand.Seed(time.Now().Unix())

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>icmm cert</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://d.line-scdn.net/liff/1.0/sdk.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <input type="text" id="bib" placeholder="เลข bib" /> &nbsp;&nbsp;
+    <button onClick="searchBib()">ค้นหา</button>
+    <script>
+      var isBusy = false;
+      function searchBib() {
+        if (isBusy) return;
+        isBusy = true;
+        var bibNo = document.querySelector("#bib").value;
+        axios
+          .get("https://bib.icmm.run/e-cert/" + bibNo)
+          .then(r => {
+            liff.sendMessages([
+              {
+                type: "image",
+                originalContentUrl: "https://bib.icmm.run/e-cert/" + bibNo,
+                previewImageUrl: "https://bib.icmm.run/e-cert/" + bibNo
+              }
+            ]);
+          })
+          .catch(e => {
+            alert("ไม่พบข้อมูล");
+          })
+          .finally(r => {
+            isBusy = false;
+          });
+      }
+      document.getElementById("bib")
+          .addEventListener("keyup", function (event) {
+            event.preventDefault();
+            if (event.keyCode === 13) {
+              searchBib();
+            }
+          });
+    </script>
+  </body>
+</html>
