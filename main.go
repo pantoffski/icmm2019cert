@@ -41,7 +41,7 @@ func InitRoutes() *chi.Mux {
 		middleware.Recoverer,
 	)
 	router.Get("/{bibNO}", genCert)
-	router.Get("/name/{bibNO}", getName)
+	//router.Get("/name/{bibNO}", getName)
 	router.Get("/liff", serveLiffHTML)
 	return router
 }
