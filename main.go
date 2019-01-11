@@ -1,18 +1,18 @@
 package main
 
 import (
+	"html/template"
 	"icmm2019cert/cert"
 	"icmm2019cert/cfg"
 	"icmm2019cert/database"
 	"log"
+	"math/rand"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
-	"os"
-	"html/template"
 	"time"
 
-	"math/rand"
 	"github.com/globalsign/mgo/bson"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -21,6 +21,7 @@ import (
 )
 
 var liffHTML *template.Template
+
 // InitRoutes the main route config
 func InitRoutes() *chi.Mux {
 	router := chi.NewRouter()
@@ -47,15 +48,16 @@ func InitRoutes() *chi.Mux {
 }
 func genCert(w http.ResponseWriter, r *http.Request) {
 	bibNO, err := strconv.Atoi(chi.URLParam(r, "bibNO"))
-	if(err!=nil){
+	if err != nil {
 		http.Error(w, "runner not found", 404)
+		return
 	}
 	// txt:=r.URL.Query().Get("txt")
 	// x:=r.URL.Query().Get("x")
 	// y:=r.URL.Query().Get("y")
 	// size:=r.URL.Query().Get("size")
 	// cert.Image(bibNO,txt,x,y,size, w)
-	 cert.Image(bibNO, w)
+	cert.Image(bibNO, w)
 }
 func getName(w http.ResponseWriter, r *http.Request) {
 	bibNO, _ := strconv.Atoi(chi.URLParam(r, "bibNO"))
@@ -78,8 +80,8 @@ func main() {
 	workDir, _ := os.Getwd()
 	liffHTML, _ = template.ParseFiles(filepath.Join(workDir, "/liff.html"))
 	http.DefaultClient.Timeout = time.Minute * 3
-	
-    rand.Seed(time.Now().Unix())
+
+	rand.Seed(time.Now().Unix())
 	r := InitRoutes()
 	walkFunc := func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		log.Printf("%s -> %s\n", method, route)
