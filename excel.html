@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>excel import</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.1/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id='app'>
+        <button @click='browse'>Browse xlsx file</button>
+
+        <input type='file' @change='processExcel' ref='excelInpFile' style='display:none;' />
+        <div style='height:200px;overflow-y:scroll;'>
+            <p v-for="(v,index) in logs" :key="index">{{JSON.stringify(v)}}</p>
+        </div>
+    </div>
+    <script>
+        var _app = new Vue({
+            el: '#app',
+            data: {
+                isBusy: false,
+                logs: []
+            }, methods: {
+                browse() {
+                    this.$refs.excelInpFile.click();
+                },
+                processRunner(sheet) {
+                    var colLen = XLSX.utils.decode_range(sheet['!ref']).e.c;
+                    var rangeLen = XLSX.utils.decode_range(sheet['!ref']).e.r + 1;
+                    var keys = ['bib', 'fullBib', 'gender', 'fName', 'lName', 'chipTime', 'gunTime']
+                    for (var row = 2; row <= colLen; row++) {
+                        var obj = {}
+                        try {
+                            for (var col = 0; col <= colLen; col++) {
+                                var colName = this.colName(col);
+                                obj[keys[col]] = sheet[colName + row].v + ""
+                            }
+                            this.logs = [obj, ...this.logs]
+                        } catch (e) { }
+                    }
+                },
+                processExcel() {
+
+                    var _this = this;
+                    if (this.isBusy) return;
+                    if (!this.$refs.excelInpFile.files[0]) return;
+                    var inp = this.$refs.excelInpFile.files[0];
+                    if (!inp.name.match(/(.xls|.xlsx)$/i)) return;
+                    this.logs = [];
+                    this.isBusy = true;
+                    var reader = new FileReader();
+                    reader.onload = (function (file) {
+                        var data = file.target.result;
+                        workbook = XLSX.read(data, {
+                            type: 'binary'
+                        });
+                        _this.processRunner(workbook.Sheets[Object.keys(workbook.Sheets)[0]])
+                        _this.isBusy = false;
+                    });
+
+                    reader.readAsBinaryString(inp);
+                },
+                colName(num) {
+                    num++;
+                    for (var ret = '', a = 1, b = 26;
+                        (num -= a) >= 0; a = b, b *= 26) {
+                        ret = String.fromCharCode(parseInt((num % b) / a) + 65) + ret;
+                    }
+                    return ret;
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
