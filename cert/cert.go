@@ -63,8 +63,8 @@ func Image(bibNO int, w http.ResponseWriter) {
 
 	// runner.GunTime = 2000000.0 + rand.Float64()*4000000
 	// runner.ChipTime = 2000000.0 + rand.Float64()*4000000
-	runner.GunTime="01:02:03"
-	runner.ChipTime="01:03:45"
+	// runner.GunTime="01:02:03"
+	// runner.ChipTime="01:03:45"
 	var xInt, yInt int
 	var fontSize float64
 	background := image.NewRGBA(image.Rect(0, 0, backgroundWidth, backgroundHeight))
