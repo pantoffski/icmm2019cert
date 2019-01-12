@@ -9,7 +9,6 @@ import (
 	_ "image/jpeg"
 	"image/png"
 	"io/ioutil"
-	"math/rand"
 	"net/http"
 	"os"
 	_ "strings"
