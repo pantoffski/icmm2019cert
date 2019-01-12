@@ -42,8 +42,8 @@ type Runner struct {
 	Gender    string        `bson:"gender"`
 	FName     string        `bson:"firstname"`
 	LName     string        `bson:"lastname"`
-	ChipTime  float64       `bson:"chiptime"`
-	GunTime   float64       `bson:"guntime"`
+	ChipTime  string       `bson:"chiptime"`
+	GunTime   string       `bson:"guntime"`
 	Challenge string        `bson:"challenge"`
 	NameOnBib string        `bson:"nameOnBib"`
 }
@@ -62,8 +62,10 @@ func Image(bibNO int, w http.ResponseWriter) {
 		return
 	}
 
-	runner.GunTime = 2000000.0 + rand.Float64()*4000000
-	runner.ChipTime = 2000000.0 + rand.Float64()*4000000
+	// runner.GunTime = 2000000.0 + rand.Float64()*4000000
+	// runner.ChipTime = 2000000.0 + rand.Float64()*4000000
+	runner.GunTime="01:02:03"
+	runner.ChipTime="01:03:45"
 	var xInt, yInt int
 	var fontSize float64
 	background := image.NewRGBA(image.Rect(0, 0, backgroundWidth, backgroundHeight))
@@ -122,21 +124,21 @@ func Image(bibNO int, w http.ResponseWriter) {
 	xInt = 500
 	yInt = 430
 	fontSize = 90.0
-	xOffset = int(getWidth(formatTime(runner.GunTime), fontSize, ctx) / 2)
+	xOffset = int(getWidth(runner.GunTime, fontSize, ctx) / 2)
 	ctx.SetFontSize(fontSize)
 	ctx.SetSrc(colorRed)
 	pt = freetype.Pt(xInt-xOffset, yInt+int(ctx.PointToFixed(fontSize)>>6))
-	ctx.DrawString(formatTime(runner.GunTime), pt)
+	ctx.DrawString(runner.GunTime, pt)
 
 	// draw chiptime
 	xInt = 635
 	yInt = 560
 	fontSize = 35.0
-	xOffset = int(getWidth(formatTime(runner.ChipTime), fontSize, ctx) / 2)
+	xOffset = int(getWidth(runner.ChipTime, fontSize, ctx) / 2)
 	ctx.SetFontSize(fontSize)
 	ctx.SetSrc(colorWhite)
 	pt = freetype.Pt(xInt-xOffset, yInt+int(ctx.PointToFixed(fontSize)>>6))
-	ctx.DrawString(formatTime(runner.ChipTime), pt)
+	ctx.DrawString(runner.ChipTime, pt)
 
 	// //draw txt
 	// xInt, _ = strconv.Atoi(x)
