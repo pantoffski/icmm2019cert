@@ -41,8 +41,8 @@ type Runner struct {
 	Gender    string        `bson:"gender"`
 	FName     string        `bson:"firstname"`
 	LName     string        `bson:"lastname"`
-	ChipTime  string       `bson:"chiptime"`
-	GunTime   string       `bson:"guntime"`
+	ChipTime  string       `bson:"chipTime"`
+	GunTime   string       `bson:"gunTime"`
 	Challenge string        `bson:"challenge"`
 	NameOnBib string        `bson:"nameOnBib"`
 }
