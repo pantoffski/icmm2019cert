@@ -18,13 +18,13 @@
         isBusy = true;
         var bibNo = document.querySelector("#bib").value;
         axios
-          .get("https://bib.icmm.run/e-cert/" + bibNo)
+          .get("https://icmm.run/e-cert/" + bibNo)
           .then(r => {
             liff.sendMessages([
               {
                 type: "image",
-                originalContentUrl: "https://bib.icmm.run/e-cert/" + bibNo,
-                previewImageUrl: "https://bib.icmm.run/e-cert/" + bibNo
+                originalContentUrl: "https://icmm.run/e-cert/" + bibNo,
+                previewImageUrl: "https://icmm.run/e-cert/" + bibNo
               }
             ]);
             liff.closeWindow();
